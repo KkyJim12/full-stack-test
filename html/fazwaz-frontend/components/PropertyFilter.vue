@@ -44,8 +44,13 @@
                     <button
                         v-for="province in provinces"
                         :key="province.id"
-                        class="px-4 py-2 mb-2 mr-2 font-semibold text-gray-600 bg-gray-300 rounded shadow-md focus:outline-none hover:bg-blue-500 hover:text-white"
+                        :class="
+                            activeProvinces.includes(province.title)
+                                ? 'px-4 py-2 mb-2 mr-2 font-semibold  rounded shadow-md focus:outline-none bg-blue-500 text-white'
+                                : 'px-4 py-2 mb-2 mr-2 font-semibold text-gray-600 bg-gray-300 rounded shadow-md focus:outline-none hover:bg-blue-500 hover:text-white'
+                        "
                         type="button"
+                        @click="selectActiveProvince(province)"
                     >
                         {{ province.title }}
                     </button>
@@ -58,9 +63,9 @@
                         v-for="show in shows"
                         :key="show.id"
                         :class="
-                            show.id === activeShow.id
-                                ? 'px-4 py-2 mb-2 mr-2 font-semibold  rounded shadow-md focus:outline-none bg-blue-500 text-white'
-                                : 'px-4 py-2 mb-2 mr-2 font-semibold text-gray-600 bg-gray-300 rounded shadow-md focus:outline-none hover:bg-blue-500 hover:text-white'
+                            show.value === activeShow
+                                ? 'px-4 py-2 mb-2 mr-2 font-semibold  rounded shadow-md focus:outline-none bg-yellow-500 text-white'
+                                : 'px-4 py-2 mb-2 mr-2 font-semibold text-gray-600 bg-gray-300 rounded shadow-md focus:outline-none hover:bg-yellow-500 hover:text-white'
                         "
                         type="button"
                         @click="selectActiveShow(show)"
@@ -70,15 +75,15 @@
                 </div>
             </div>
             <div class="flex flex-col space-y-2">
-                <h4 class="font-semibold">Provinces</h4>
+                <h4 class="font-semibold">Sort</h4>
                 <div class="flex flex-wrap">
                     <button
                         v-for="sort in sorts"
                         :key="sort.id"
                         :class="
-                            sort.id === activeSort.id
-                                ? 'px-4 py-2 mb-2 mr-2 font-semibold  rounded shadow-md focus:outline-none bg-blue-500 text-white'
-                                : 'px-4 py-2 mb-2 mr-2 font-semibold text-gray-600 bg-gray-300 rounded shadow-md focus:outline-none hover:bg-blue-500 hover:text-white'
+                            sort.value === activeSort
+                                ? 'px-4 py-2 mb-2 mr-2 font-semibold  rounded shadow-md focus:outline-none bg-purple-500 text-white'
+                                : 'px-4 py-2 mb-2 mr-2 font-semibold text-gray-600 bg-gray-300 rounded shadow-md focus:outline-none hover:bg-purple-500 hover:text-white'
                         "
                         type="button"
                         @click="selectActiveSort(sort)"
@@ -95,9 +100,6 @@
 export default {
     data() {
         return {
-            activeStatus: ['Sale'],
-            activeShow: { id: 2, value: 25 },
-            activeSort: { id: 1, title: 'Price: low-high' },
             provinces: [],
             shows: [
                 { id: 1, value: 10 },
@@ -106,39 +108,90 @@ export default {
                 { id: 4, value: 100 },
             ],
             sorts: [
-                { id: 1, title: 'Price: low-high' },
-                { id: 2, title: 'Price: high-low' },
-                { id: 3, title: 'Title: a-z' },
-                { id: 4, title: 'Title: z-a' },
+                { id: 1, title: 'Price: low-high', value: 'price-low-to-high' },
+                { id: 2, title: 'Price: high-low', value: 'price-high-to-low' },
+                { id: 3, title: 'Title: a-z', value: 'title-a-to-z' },
+                { id: 4, title: 'Title: z-a', value: 'title-z-to-a' },
             ],
         };
     },
+    async fetch() {
+        await this.getProvinces();
+    },
+    computed: {
+        activeStatus() {
+            return this.$store.state.filter.activeStatus;
+        },
+        activeProvinces() {
+            return this.$store.state.filter.activeProvinces;
+        },
+        activeShow() {
+            return this.$store.state.filter.activeShow;
+        },
+        activeSort() {
+            return this.$store.state.filter.activeSort;
+        },
+        page() {
+            return this.$store.state.filter.page;
+        },
+    },
     methods: {
         resetFilter() {
-            this.activeStatus = ['Sale'];
-            this.activeShow = { id: 2, value: 25 };
-            this.activeSort = { id: 1, title: 'Price: low-high' };
+            this.$store.commit('filter/resetFilter');
+            this.replaceQueryParams();
+        },
+        selectActiveProvince(province) {
+            this.$store.commit('filter/selectActiveProvince', { province });
+            this.replaceQueryParams();
         },
         selectActiveShow(show) {
-            this.activeShow = show;
+            this.$store.commit('filter/selectActiveShow', { show });
+            this.replaceQueryParams();
         },
         selectActiveSort(sort) {
-            this.activeSort = sort;
+            this.$store.commit('filter/selectActiveSort', { sort });
+            this.replaceQueryParams();
         },
         switchSale() {
-            if (this.activeStatus.includes('Sale')) {
-                this.activeStatus = this.activeStatus.filter((status) => status !== 'Sale');
-                return true;
-            }
-            this.activeStatus.push('Sale');
+            this.$store.commit('filter/switchSale');
+            this.replaceQueryParams();
         },
 
         switchSold() {
-            if (this.activeStatus.includes('Sold')) {
-                this.activeStatus = this.activeStatus.filter((status) => status !== 'Sold');
-                return true;
+            this.$store.commit('filter/switchSold');
+            this.replaceQueryParams();
+        },
+
+        async getProvinces() {
+            try {
+                const response = await this.$axios.get(`/api/v1/provinces`);
+                this.provinces = response.data.data;
+                if (this.provinces.length) {
+                    this.selectActiveProvince(this.provinces[0]);
+                }
+            } catch (error) {}
+        },
+
+        replaceQueryParams() {
+            const status = this.activeStatus ? this.activeStatus.join(',') : null;
+            const provinces = this.activeProvinces ? this.activeProvinces.join(',') : null;
+            const show = this.activeShow;
+            const sort = this.activeSort;
+            const page = this.page;
+            const queryParams = { sort: sort, page: page, limit: show };
+
+            if (status) {
+                queryParams.status = status;
             }
-            this.activeStatus.push('Sold');
+
+            if (provinces) {
+                queryParams.provinces = provinces;
+            }
+
+            this.$router.replace({
+                name: '',
+                query: queryParams,
+            });
         },
     },
 };
