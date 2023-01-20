@@ -28,10 +28,11 @@ return new class extends Migration
             $table->integer('bathrooms');
             $table->integer('area');
             $table->string('area_type');
-            $table->foreignId('province_id')->constrained();
             $table->string('photo_thumb');
             $table->string('photo_search');
             $table->string('photo_full');
+            $table->longText('street');
+            $table->foreignId('province_id')->constrained();
             $table->timestamps();
         });
     }

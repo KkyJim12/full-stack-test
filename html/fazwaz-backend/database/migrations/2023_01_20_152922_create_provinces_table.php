@@ -17,7 +17,6 @@ return new class extends Migration
             $table->id();
             $table->string('country');
             $table->string('title');
-            $table->longText('street');
             $table->timestamps();
         });
     }
