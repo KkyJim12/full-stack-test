@@ -35,6 +35,11 @@ class Property extends Model
         return $this->hasOne(Province::class, 'id', 'province_id');
     }
 
+    public function scopeSearch($query, $search)
+    {
+        $query->where('title', 'like', '%' . $search . '%')->orWhere('street', 'like', '%' . $search . '%');
+    }
+
     public function scopeProvinces($query, $provinces)
     {
         $activeProvinces = explode(',', $provinces);

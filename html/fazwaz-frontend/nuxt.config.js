@@ -1,6 +1,5 @@
 export default {
-    target: 'static',
-
+    target: 'server',
     head: {
         title: 'fazwaz-frontend',
         htmlAttrs: {
@@ -23,10 +22,20 @@ export default {
 
     buildModules: ['@nuxtjs/eslint-module', '@nuxtjs/tailwindcss'],
 
-    modules: ['@nuxtjs/axios'],
+    modules: ['@nuxtjs/axios', '@nuxtjs/proxy'],
 
     axios: {
+        proxy: true,
         baseURL: 'http://localhost:8000',
+    },
+
+    proxy: {
+        '/api': {
+            target: `http://localhost:8000/api`,
+            pathRewrite: {
+                '^/api': '/',
+            },
+        },
     },
 
     build: {},

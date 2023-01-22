@@ -12,6 +12,20 @@
         </div>
         <div class="flex flex-col space-y-4">
             <div class="flex flex-col space-y-2">
+                <h4 class="font-semibold">Search</h4>
+                <form class="flex space-x-2" @submit.prevent="filterBySearch()">
+                    <input
+                        v-model="searchInput"
+                        class="w-full px-4 py-2 text-gray-600 rounded shadow-md focus:outline-none"
+                        type="text"
+                        placeholder="Search by title or location"
+                    />
+                    <button type="submit" class="px-4 py-2 text-white bg-green-500 rounded hover:bg-green-600">
+                        Search
+                    </button>
+                </form>
+            </div>
+            <div class="flex flex-col space-y-2">
                 <h4 class="font-semibold">Status</h4>
                 <div class="flex space-x-2">
                     <button
@@ -100,6 +114,7 @@
 export default {
     data() {
         return {
+            searchInput: '',
             provinces: [],
             shows: [
                 { id: 1, value: 10 },
@@ -134,10 +149,16 @@ export default {
         page() {
             return this.$store.state.filter.page;
         },
+        search() {
+            return this.$store.state.filter.search;
+        },
     },
     methods: {
         resetFilter() {
             this.$store.commit('filter/resetFilter');
+            if (this.provinces.length) {
+                this.selectActiveProvince(this.provinces[0]);
+            }
             this.replaceQueryParams();
         },
         selectActiveProvince(province) {
@@ -154,11 +175,15 @@ export default {
         },
         switchSale() {
             this.$store.commit('filter/switchSale');
-            this.replaceQueryParams();
         },
 
         switchSold() {
             this.$store.commit('filter/switchSold');
+            this.replaceQueryParams();
+        },
+
+        filterBySearch() {
+            this.$store.commit('filter/filterBySearch', { search: this.searchInput });
             this.replaceQueryParams();
         },
 
@@ -169,29 +194,28 @@ export default {
                 if (this.provinces.length) {
                     this.selectActiveProvince(this.provinces[0]);
                 }
-            } catch (error) {}
+            } catch (error) {
+                console.log(error.response)
+            }
         },
 
         replaceQueryParams() {
-            const status = this.activeStatus ? this.activeStatus.join(',') : null;
-            const provinces = this.activeProvinces ? this.activeProvinces.join(',') : null;
+            const status = this.activeStatus ? this.activeStatus.join(',') : '';
+            const provinces = this.activeProvinces ? this.activeProvinces.join(',') : '';
             const show = this.activeShow;
             const sort = this.activeSort;
             const page = this.page;
-            const queryParams = { sort: sort, page: page, limit: show };
+            const search = this.search;
+            const queryParams = {
+                status: status,
+                provinces: provinces,
+                sort: sort,
+                page: page,
+                limit: show,
+                search: search,
+            };
 
-            if (status) {
-                queryParams.status = status;
-            }
-
-            if (provinces) {
-                queryParams.provinces = provinces;
-            }
-
-            this.$router.replace({
-                name: '',
-                query: queryParams,
-            });
+            this.$router.replace({ query: queryParams });
         },
     },
 };

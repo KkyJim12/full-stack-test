@@ -15,22 +15,23 @@ class PropertyController extends Controller
 
         switch ($sort) {
             case "price-high-to-low":
-                $sortMain = 'price';
-                $sortArrange = 'desc';
+                $sort_main = 'price';
+                $sort_arrange = 'desc';
                 break;
             case "title-a-to-z":
-                $sortMain = 'title';
-                $sortArrange = 'asc';
+                $sort_main = 'title';
+                $sort_arrange = 'asc';
                 break;
             case "title-z-to-a":
-                $sortMain = 'title';
-                $sortArrange = 'desc';
+                $sort_main = 'title';
+                $sort_arrange = 'desc';
                 break;
             default:
-                $sortMain = 'price';
-                $sortArrange = 'asc';
+                $sort_main = 'price';
+                $sort_arrange = 'asc';
         }
 
+        $search = $request->query('search');
         $status = $request->query('status');
         $provinces = $request->query('provinces');
         $limit = (int) $request->query('limit');
@@ -38,13 +39,19 @@ class PropertyController extends Controller
         $skip = ($page - 1) * $limit;
 
         $properties = Property::with(['province'])
+            ->search($search)
             ->provinces($provinces)
             ->status($status)
-            ->orderBy($sortMain, $sortArrange)
+            ->orderBy($sort_main, $sort_arrange);
+
+
+        $properties_count = $properties->count();
+
+        $properties_limit = $properties
             ->skip($skip)
             ->take($limit)
             ->get();
 
-        return response()->json(['data' => $properties, 'status' => 'success'], 200);
+        return response()->json(['data' => $properties_limit, 'count' => $properties_count, 'status' => 'success'], 200);
     }
 }
