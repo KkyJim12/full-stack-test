@@ -10,7 +10,6 @@ class PropertyController extends Controller
 {
     public function index(Request $request)
     {
-
         $sort = $request->query('sort');
 
         switch ($sort) {

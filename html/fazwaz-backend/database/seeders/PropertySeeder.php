@@ -17,7 +17,7 @@ class PropertySeeder extends Seeder
      */
     public function run()
     {
-        $data = File::get('database/data/properties.json');
+        $data = File::get('database/data/properties_test.json');
         $properties =  json_decode($data, true);
 
         foreach ($properties as $property) {
