@@ -26,12 +26,12 @@ export default {
 
     axios: {
         proxy: true,
-        baseURL: 'http://localhost',
+        baseURL: 'http://localhost:8000',
     },
 
     proxy: {
         '/api': {
-            target: `http://localhost/api`,
+            target: `http://localhost:8000/api`,
             pathRewrite: {
                 '^/api': '/',
             },

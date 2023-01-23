@@ -31,11 +31,11 @@ class PropertyController extends Controller
                 $sort_arrange = 'asc';
         }
 
-        $search = $request->query('search');
-        $status = $request->query('status');
-        $provinces = $request->query('provinces');
-        $limit = (int) $request->query('limit');
-        $page = (int) $request->query('page');
+        $search = is_null($request->query('search')) ? '' : $request->query('search');
+        $status = is_null($request->query('status')) ? '' : $request->query('status');
+        $provinces = is_null($request->query('provinces')) ? '' : $request->query('provinces');
+        $limit = is_null($request->query('limit')) ? 25 : (int) $request->query('limit');
+        $page = is_null($request->query('page')) ? 1 : (int) $request->query('page');
         $skip = ($page - 1) * $limit;
 
         $properties = Property::with(['province'])

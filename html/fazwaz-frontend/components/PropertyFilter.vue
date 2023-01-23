@@ -131,6 +131,7 @@ export default {
         };
     },
     async fetch() {
+        this.bindQueryString();
         await this.getProvinces();
     },
     computed: {
@@ -156,50 +157,45 @@ export default {
     methods: {
         resetFilter() {
             this.$store.commit('filter/resetFilter');
-            if (this.provinces.length) {
-                this.selectActiveProvince(this.provinces[0]);
-            }
-            this.replaceQueryParams();
+            this.replaceQueryStrings();
         },
         selectActiveProvince(province) {
             this.$store.commit('filter/selectActiveProvince', { province });
-            this.replaceQueryParams();
+            this.replaceQueryStrings();
         },
         selectActiveShow(show) {
             this.$store.commit('filter/selectActiveShow', { show });
-            this.replaceQueryParams();
+            this.replaceQueryStrings();
         },
         selectActiveSort(sort) {
             this.$store.commit('filter/selectActiveSort', { sort });
-            this.replaceQueryParams();
+            this.replaceQueryStrings();
         },
         switchSale() {
             this.$store.commit('filter/switchSale');
+            this.replaceQueryStrings();
         },
 
         switchSold() {
             this.$store.commit('filter/switchSold');
-            this.replaceQueryParams();
+            this.replaceQueryStrings();
         },
 
         filterBySearch() {
             this.$store.commit('filter/filterBySearch', { search: this.searchInput });
-            this.replaceQueryParams();
+            this.replaceQueryStrings();
         },
 
         async getProvinces() {
             try {
                 const response = await this.$axios.get(`/api/v1/provinces`);
                 this.provinces = response.data.data;
-                if (this.provinces.length) {
-                    this.selectActiveProvince(this.provinces[0]);
-                }
             } catch (error) {
-                console.log(error.response)
+                console.log(error.response);
             }
         },
 
-        replaceQueryParams() {
+        replaceQueryStrings() {
             const status = this.activeStatus ? this.activeStatus.join(',') : '';
             const provinces = this.activeProvinces ? this.activeProvinces.join(',') : '';
             const show = this.activeShow;
@@ -215,7 +211,33 @@ export default {
                 search: search,
             };
 
-            this.$router.replace({ query: queryParams });
+            this.$router.push({ query: queryParams });
+        },
+
+        bindQueryString() {
+            if (this.$route.query.status) {
+                const status = this.$route.query.status.split(',');
+                this.$store.commit('filter/setStatus', { status: status });
+            }
+
+            if (this.$route.query.provinces) {
+                const provinces = this.$route.query.provinces.split(',');
+                this.$store.commit('filter/setProvinces', { provinces: provinces });
+            }
+
+            if (this.$route.query.limit) {
+                const limit = this.$route.query.limit;
+                this.$store.commit('filter/setShow', { show: limit });
+            }
+
+            if (this.$route.query.sort) {
+                const sort = this.$route.query.sort;
+                this.$store.commit('filter/setSort', { sort: sort });
+            }
+
+            if (this.$route.query.search) {
+                this.searchInput = this.$route.query.search;
+            }
         },
     },
 };

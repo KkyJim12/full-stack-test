@@ -77,12 +77,14 @@ export default {
     methods: {
         async getProperties() {
             try {
-                const status = this.$route.query.status;
-                const provinces = this.$route.query.provinces;
-                const sort = this.$route.query.sort;
+                const status = this.$route.query.status ? this.$route.query.status : this.activeStatus.join('');
+                const provinces = this.$route.query.provinces
+                    ? this.$route.query.provinces
+                    : this.activeProvinces.join('');
+                const sort = this.$route.query.sort ? this.$route.query.sort : this.activeSort;
                 const page = this.page;
-                const show = this.$route.query.limit;
-                const search = this.$route.query.search;
+                const show = this.$route.query.limit ? this.$route.query.limit : this.activeShow;
+                const search = this.$route.query.search ? this.$route.query.search : this.search;
                 const response = await this.$axios.get(
                     `/api/v1/properties?status=${status}&provinces=${provinces}&sort=${sort}&page=${page}&limit=${show}&search=${search}`
                 );

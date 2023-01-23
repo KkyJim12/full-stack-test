@@ -42,28 +42,26 @@ class Property extends Model
 
     public function scopeProvinces($query, $provinces)
     {
-        $activeProvinces = explode(',', $provinces);
-
-        if (count($activeProvinces) > 0) {
-            $query->whereHas('province',  function ($query) use ($activeProvinces) {
-                $query->whereIn('title', $activeProvinces);
-            });
-        } else {
-            $query->whereHas('province',  function ($query) use ($activeProvinces) {
-                $query->whereIn('title', []);
-            });
+        if ($provinces != '') {
+            $activeProvinces = explode(',', $provinces);
+            if (count($activeProvinces) > 0) {
+                $query->whereHas('province',  function ($query) use ($activeProvinces) {
+                    $query->whereIn('title', $activeProvinces);
+                });
+            }
         }
     }
 
     public function scopeStatus($query, $status)
     {
-        $activeStatuses = explode(',', $status);
-
-        if (count($activeStatuses) == 1) {
-            if ($activeStatuses[0] == 'Sold') {
-                $query->where('is_sold', true);
-            } else {
-                $query->where('is_sold', false);
+        if ($status != '') {
+            $activeStatuses = explode(',', $status);
+            if (count($activeStatuses) == 1) {
+                if ($activeStatuses[0] == 'Sold') {
+                    $query->where('is_sold', true);
+                } else {
+                    $query->where('is_sold', false);
+                }
             }
         }
     }
