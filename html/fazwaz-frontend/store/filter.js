@@ -9,14 +9,10 @@ export const state = () => ({
 
 export const mutations = {
     prevPage(state) {
-        if (state.page > 1) {
-            state.page--;
-        }
+        state.page--;
     },
-    nextPage(state, { propertiesCount }) {
-        if (state.page * state.activeShow < propertiesCount) {
-            state.page++;
-        }
+    nextPage(state) {
+        state.page++;
     },
     resetFilter(state) {
         state.search = '';

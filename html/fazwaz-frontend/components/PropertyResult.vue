@@ -94,12 +94,16 @@ export default {
             }
         },
         async prevPage() {
-            this.$store.commit('filter/prevPage');
-            await this.getProperties();
+            if (this.page > 1) {
+                this.$store.commit('filter/prevPage');
+                await this.getProperties();
+            }
         },
         async nextPage() {
-            this.$store.commit('filter/nextPage', { propertiesCount: this.propertiesCount });
-            await this.getProperties();
+            if (this.page * this.activeShow < this.propertiesCount) {
+                this.$store.commit('filter/nextPage');
+                await this.getProperties();
+            }
         },
     },
 };
