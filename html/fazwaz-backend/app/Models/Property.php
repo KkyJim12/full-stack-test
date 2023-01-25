@@ -30,6 +30,27 @@ class Property extends Model
         'province_id',
     ];
 
+    protected $casts = [
+        'title' => 'string',
+        'description' => 'string',
+        'for_sale' => 'boolean',
+        'for_rent' => 'boolean',
+        'is_sold' => 'boolean',
+        'price' => 'integer',
+        'currency' => 'string',
+        'currency_symbol' => 'string',
+        'property_type' => 'string',
+        'bedrooms' => 'integer',
+        'bathrooms' => 'integer',
+        'area' => 'string',
+        'area_type' => 'string',
+        'photo_thumb' => 'string',
+        'photo_search' => 'string',
+        'photo_full' => 'string',
+        'street' => 'string',
+        'province_id' => 'integer',
+    ];
+
     public function province()
     {
         return $this->hasOne(Province::class, 'id', 'province_id');
@@ -37,7 +58,7 @@ class Property extends Model
 
     public function scopeSearch($query, $search)
     {
-        $query->where('title', 'like', '%' . $search . '%')->orWhere('street', 'like', '%' . $search . '%');
+        $query->where('title', 'like', '%' . $search . '%');
     }
 
     public function scopeProvinces($query, $provinces)
