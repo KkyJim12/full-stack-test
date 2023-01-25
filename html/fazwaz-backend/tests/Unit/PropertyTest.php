@@ -28,7 +28,7 @@ class PropertyTest extends TestCase
         $response = $this->get('/api/v1/properties?page=1&limit=1000')->assertStatus(200);
         $properties = $response->decodeResponseJson()['data'];
 
-        $this->assertCount(200, $properties);
+        $this->assertCount(100, $properties);
     }
 
     public function test_get_properties_filtered_by_status_sales()
@@ -56,7 +56,7 @@ class PropertyTest extends TestCase
         $response = $this->get('/api/v1/properties?status=Sale,Sold&page=1&limit=1000')->assertStatus(200);
         $properties = $response->decodeResponseJson()['data'];
 
-        $this->assertCount(200, $properties);
+        $this->assertCount(100, $properties);
     }
 
     public function test_get_properties_filtered_by_search()

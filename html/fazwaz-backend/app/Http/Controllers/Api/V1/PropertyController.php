@@ -38,6 +38,7 @@ class PropertyController extends Controller
         $skip = ($page - 1) * $limit;
 
         $properties = Property::with(['province'])
+            ->where('for_sale', true)
             ->search($search)
             ->provinces($provinces)
             ->status($status)

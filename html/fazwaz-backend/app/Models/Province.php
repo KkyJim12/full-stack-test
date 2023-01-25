@@ -13,4 +13,9 @@ class Province extends Model
         'country',
         'title',
     ];
+
+    protected $casts = [
+        'country' => 'string',
+        'title' => 'string',
+    ];
 }
